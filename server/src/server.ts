@@ -6,8 +6,8 @@ require("dotenv").config();
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-const mongoURI = process.env.MONGO_URI || '';
-const PORT = process.env.PORT || '4001';
+const mongoURI = process.env.MONGO_URI || ""; // UPDATE:: Update your user name and password along with mongo url
+const PORT = process.env.PORT || "4001";
 app.get("/", (req, res) => {
   res.send("API is UP");
 });
