@@ -6,12 +6,12 @@ import jwt from "jsonwebtoken";
 import { jwtSecret } from "../config";
 
 const normalizeUser = (user: UserDocument) => {
-  const token = jwt.sign({id: user.id, email: user.email}, jwtSecret);
+  const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret);
   return {
     email: user.email,
     username: user.username,
     id: user.id,
-    token
+    token,
   };
 };
 
@@ -36,5 +36,34 @@ export const register = async (
     }
 
     next(err);
+  }
+};
+
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    if (!email) {
+      return res.status(400).json({ message: "email is required" });
+    }
+    const user = await userModel.findOne({ email }).select("+password");
+    if (user) {
+      const isMatchingPassword = await user.validatePassword(password);
+      if (isMatchingPassword) {
+        return res.status(200).json(normalizeUser(user));
+      }
+    }
+    return res.status(400).json({ message: "Invalid email or password" });
+  } catch (err) {
+    if (err instanceof Error.ValidationError) {
+      console.log("err", err);
+      const messages = Object.values(err.errors).map((err) => err.message);
+      return res.status(422).json(messages);
+    }
   }
 };

@@ -20,6 +20,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/users", usersController.register);
+app.post("/api/users/login", usersController.login);
+
 
 io.on("connection", () => {
   console.log("connect");
